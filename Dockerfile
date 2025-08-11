@@ -1,9 +1,9 @@
-FROM maven:3.9.11-eclipse-temurin-11-alpine as build
-RUN apk add git
+FROM maven:3.9.11-eclipse-temurin-11-alpine AS build
+RUN apk add --no-cache git
 RUN git clone https://github.com/spring-projects/spring-petclinic.git && \
      cd spring-petclinic && \
      mvn package
-FROM openjdk:25-ea-17-jdk as run
+FROM openjdk:25-ea-17-jdk AS run
 RUN adduser -D -h /usr/share/demo -s /bin/bash user1
 USER user1
 WORKDIR /usr/share/demo 
