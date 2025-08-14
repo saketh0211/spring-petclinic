@@ -1,4 +1,4 @@
-FROM Maven:3.9.11-eclipse-temurin-17-alpine AS build
+FROM maven:3.9.11-eclipse-temurin-17-alpine AS build
 RUN git clone https://github.com/saketh0211/spring-petclinic.git && \
     cd spring-petclinic && \
     mvn package
