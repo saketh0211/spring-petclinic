@@ -12,7 +12,7 @@ USER testuser
 WORKDIR /usr/share/demo
 COPY --from=build /spring-petclinic/target/*.jar .
 EXPOSE 8080/tcp
-CMD ["jav","-jar","spring-petclinic-3.5.0-SNAPSHOT.jar"]
+CMD ["java","-jar","spring-petclinic-3.5.0-SNAPSHOT.jar"]
 
 
 
