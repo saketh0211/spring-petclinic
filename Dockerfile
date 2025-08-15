@@ -5,7 +5,7 @@ RUN git clone https://github.com/saketh0211/spring-petclinic.git && \
 
 
 
-FROM amazoncorretto:17 AS run
+FROM eclipse-temurin:17.0.16_8-jre AS run
 RUN adduser -m -d /usr/share/demo -s /bin/bash testuser
 USER testuser
 WORKDIR /usr/share/demo
