@@ -9,7 +9,7 @@ FROM eclipse-temurin:17.0.16_8-jre-ubi9-minimal AS run
 RUN adduser -m -d /usr/share/demo -s /bin/bash testuser
 USER testuser
 WORKDIR /usr/share/demo
-COPY --from=build /target/*.jar saketh.jar
+COPY --from=build /spring-petclinic/target/*.jar saketh.jar
 EXPOSE 8080/tcp
 CMD ["java","-jar","saketh.jar"]
 
