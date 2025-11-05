@@ -29,33 +29,30 @@ pipeline {
         stage ('publish artidfacts to jfrog') {
             steps {
                 script {
-                    // New CLI-based syntax for JFrog Plugin 1.5.x
-                    def server= rtServer(
-                        id: 'JFROG_SPC_JAVA',                // must match the Server ID you configured
-                        url: 'https://saketh0211.jfrog.io/artifactory',
-                        credentialsId: 'jfrog-token'
-                        )
-                    
-                  def uploadSpec = """{
-                        "files": [
-                            {
-                                "pattern": "target/*.jar",
-                                "target": "javaspc-libs-release-local/"
-                            }
-                        ]
-                    }"""
-                // Upload artifacts
-                    rtUpload(
-                        serverId: 'JFROG_SPC_JAVA',
-                        spec: uploadSpec
-                    )
+                     
+                    // ✅ Configure JFrog CLI with credentials
+                    sh '''
+                        jf c add JFROG_SPC_JAVA \
+                        --url=https://saketh0211.jfrog.io \
+                        --access-token=$JFROG_ACCESS_TOKEN \
+                        --interactive=false
+                    '''
 
-                    // Publish build info
-                    rtPublishBuildInfo(
-                        serverId: 'JFROG_SPC_JAVA'
-                    )
-                }   
-            }   
+                    // ✅ Upload the .jar file to your Artifactory repository
+                    sh '''
+                        jf rt upload "target/*.jar" "javaspc-libs-release-local/" \
+                        --server-id=JFROG_SPC_JAVA \
+                        --build-name=spring-petclinic \
+                        --build-number=$BUILD_NUMBER
+                    '''
+
+                    // ✅ Publish build info to Artifactory
+                    sh '''
+                        jf rt build-publish spring-petclinic $BUILD_NUMBER \
+                        --server-id=JFROG_SPC_JAVA
+                    '''
+                }
+            }
         }
     }
 
