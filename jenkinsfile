@@ -1,0 +1,62 @@
+pipeline {
+    agent {
+        label 'JAVA'
+    }
+    triggers {
+        pollSCM('* * * * *')
+    }
+    stages {
+        stage ('git checkout'){
+            steps {
+                git url: 'https://github.com/saketh0211/spring-petclinic.git',
+                branch: 'main'
+            }
+
+        }
+        stage ('java build and scan') {
+            steps {
+                withSonarQubeEnv('Sonar') {
+                 sh '''mvn package sonar:sonar \
+                  -Dsonar.projectKey=saketh0211_spring-petclinic \
+                  -Dsonar.projectName=saketh0211 \
+                  -Dsonar.organization=saketh0211 \
+                  -Dsonar.host.url=https://sonarcloud.io \
+                  -Dsonar.login=$SONAR_AUTH_TOKEN '''// when we are providing the token id in jenkins while creating we need to use this only. 
+                   
+                }
+            }
+        }
+        stage ('publish artidfacts') {
+            steps {
+                script {
+                    def server= Artifactory.server('JFROG_SPC_JAVA')
+                    def uploadSpec= '''{
+                    "files": [
+                        {
+                           "pattern":"target/*.jar",
+                            "target": "javaspc-libs-release-local/"
+                        }
+                    ]
+                    }'''
+                
+                server.upload(spec: uploadSpec)
+                server.publishBuildInfo()
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+              archiveArtifacts artifacts: '**/target/*.jar'
+            junit '**/target/surefire-reports/*.xml'
+        }
+        success {
+            echo "it is working"
+        }
+        failure {
+            echo "not working"
+        }
+    }
+
+}
