@@ -79,8 +79,12 @@ pipeline {
 
     post {
         always {
+            script {
+                node {
               archiveArtifacts artifacts: '**/target/*.jar'
             junit '**/target/surefire-reports/*.xml'
+                }
+            }
         }
         success {
             echo "it is working"
