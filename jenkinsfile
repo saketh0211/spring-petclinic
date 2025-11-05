@@ -26,23 +26,36 @@ pipeline {
                 }
             }
         }
-        stage ('publish artidfacts') {
+        stage ('publish artidfacts to jfrog') {
             steps {
                 script {
-                    def server= Artifactory.server('JFROG_SPC_JAVA')
-                    def uploadSpec= '''{
-                    "files": [
-                        {
-                           "pattern":"target/*.jar",
-                            "target": "javaspc-libs-release-local/"
-                        }
-                    ]
-                    }'''
-                
-                server.upload(spec: uploadSpec)
-                server.publishBuildInfo()
-                }
-            }
+                    // New CLI-based syntax for JFrog Plugin 1.5.x
+                    def server= rtServer(
+                        id: 'JFROG_SPC_JAVA',                // must match the Server ID you configured
+                        url: 'https://saketh0211.jfrog.io/artifactory',
+                        credentialsId: 'jfrog-token'
+                        )
+                    
+                  def uploadSpec = """{
+                        "files": [
+                            {
+                                "pattern": "target/*.jar",
+                                "target": "javaspc-libs-release-local/"
+                            }
+                        ]
+                    }"""
+                // Upload artifacts
+                    rtUpload(
+                        serverId: 'JFROG_SPC_JAVA',
+                        spec: uploadSpec
+                    )
+
+                    // Publish build info
+                    rtPublishBuildInfo(
+                        serverId: 'JFROG_SPC_JAVA'
+                    )
+                }   
+            }   
         }
     }
 
