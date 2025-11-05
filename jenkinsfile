@@ -4,7 +4,7 @@ pipeline {
     }
      environment {
         SONAR_AUTH_TOKEN   = credentials('SONAR_AUTH_TOKEN')
-        JFROG_ACCESS_TOKEN = credentials('JFROG_ACCESS_TOKEN')
+        JFROG_ACCESS_TOKEN = credentials('Jfrog token')
     }
     triggers {
         pollSCM('* * * * *')
