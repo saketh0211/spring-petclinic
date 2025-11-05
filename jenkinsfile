@@ -20,7 +20,7 @@ pipeline {
         stage ('java build and scan') {
             steps {
                 withSonarQubeEnv('Sonar') {
-                 sh '''mvn package sonar:sonar \
+                 sh '''mvn clean test package sonar:sonar \
                   -Dsonar.projectKey=saketh0211_spring-petclinic \
                   -Dsonar.projectName=saketh0211 \
                   -Dsonar.organization=saketh0211 \
@@ -35,27 +35,31 @@ pipeline {
                 script {
                      // 🧰 Use installed JFrog CLI
                     def jfrogCli = tool 'jfrog-cli'
+                    
                     // ✅ Configure JFrog CLI with credentials
-                    sh """
-                        ${jfrogCli}/jf c add JFROG_SPC_JAVA \
-                        --url=https://saketh0211.jfrog.io \
-                        --access-token=${JFROG_ACCESS_TOKEN} \
+                    sh '''
+                        export PATH=$jfrogCli:\$PATH
+                        jf c add JFROG_SPC_JAVA \
+                        --url=https://saketh0211.jfrog.io/artifactory \
+                        --access-token=$JFROG_ACCESS_TOKEN \
                         --interactive=false
-                    """
+                    '''
 
                     // ✅ Upload the .jar file to your Artifactory repository
-                    sh """
-                         ${jfrogCli}/jf rt upload "target/*.jar" "javaspc-libs-release-local/" \
+                    sh '''
+                         export PATH=$jfrogCli:\$PATH
+                         jf rt upload "target/*.jar" "javaspc-libs-release-local/" \
                         --server-id=JFROG_SPC_JAVA \
                         --build-name=spring-petclinic \
                         --build-number=$BUILD_NUMBER
-                    """
+                    '''
 
                     // ✅ Publish build info to Artifactory
-                    sh """
-                        ${jfrogCli}/jf rt build-publish spring-petclinic $BUILD_NUMBER \
+                    sh '''
+                        export PATH=$jfrogCli:\$PATH
+                        jf rt build-publish spring-petclinic $BUILD_NUMBER \
                         --server-id=JFROG_SPC_JAVA
-                    """
+                    '''
                       
                 }
             }
@@ -63,11 +67,11 @@ pipeline {
         stage ('JFrog Xray Vulnerability Scan') {
             steps {
                 script {
-                    def jfrogCli = tool 'jfrog-cli'
+                    
                     
                     // ✅ Scan the uploaded JAR for security issues
                     sh """
-                        ${jfrogCli}/jf xr scan "target/*.jar" \
+                        jf xr scan "target/*.jar" \
                         --server-id=JFROG_SPC_JAVA \
                         --min-severity=High \
                         --fail=false
@@ -81,8 +85,8 @@ pipeline {
         always {
             script {
                 node {
-              archiveArtifacts artifacts: '**/target/*.jar'
-            junit '**/target/surefire-reports/*.xml'
+                    archiveArtifacts artifacts: '**/target/*.jar'
+                    junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
                 }
             }
         }
