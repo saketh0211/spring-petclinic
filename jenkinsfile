@@ -37,29 +37,29 @@ pipeline {
                     def jfrogCli = tool 'jfrog-cli'
                     
                     // ✅ Configure JFrog CLI with credentials
-                    sh '''
+                    sh """
                         export PATH=$jfrogCli:\$PATH
                         jf c add JFROG_SPC_JAVA \
                         --url=https://saketh0211.jfrog.io/artifactory \
                         --access-token=$JFROG_ACCESS_TOKEN \
                         --interactive=false
-                    '''
+                    """
 
                     // ✅ Upload the .jar file to your Artifactory repository
-                    sh '''
+                    sh """
                          export PATH=$jfrogCli:\$PATH
                          jf rt upload "target/*.jar" "javaspc-libs-release-local/" \
                         --server-id=JFROG_SPC_JAVA \
                         --build-name=spring-petclinic \
                         --build-number=$BUILD_NUMBER
-                    '''
+                    """
 
                     // ✅ Publish build info to Artifactory
-                    sh '''
+                    sh """
                         export PATH=$jfrogCli:\$PATH
                         jf rt build-publish spring-petclinic $BUILD_NUMBER \
                         --server-id=JFROG_SPC_JAVA
-                    '''
+                    """
                       
                 }
             }
