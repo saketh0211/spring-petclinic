@@ -84,7 +84,7 @@ pipeline {
         stage('Upload to JFrog Artifactory') {
             steps {
                 script {
-                    def server = Artifactory.server('$JFROG_ACCESS_TOKEN')
+                    def server = Artifactory.server('$newtokenjfrog')
                     def buildInfo = Artifactory.newBuildInfo()
 
                     server.upload(
