@@ -20,14 +20,16 @@ pipeline {
         stage ('java build and scan') {
             steps {
                 withSonarQubeEnv('Sonar') {
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                  sh '''mvn clean test package sonar:sonar \
                   -Dsonar.projectKey=saketh0211_spring-petclinic \
                   -Dsonar.projectName=saketh0211 \
                   -Dsonar.organization=saketh0211 \
                   -Dsonar.host.url=https://sonarcloud.io \
                   -Dsonar.login=$SONAR_AUTH_TOKEN '''// when we are providing the token id in jenkins while creating we need to use this only. 
-                   
+                
                 }
+             }
             }
         }
       /*  stage ('publish artidfacts to jfrog') {
@@ -82,7 +84,7 @@ pipeline {
         stage('Upload to JFrog Artifactory') {
             steps {
                 script {
-                    def server = Artifactory.server('Jfrog token')
+                    def server = Artifactory.server('$JFROG_ACCESS_TOKEN')
                     def buildInfo = Artifactory.newBuildInfo()
 
                     server.upload(
