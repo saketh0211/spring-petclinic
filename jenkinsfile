@@ -30,7 +30,7 @@ pipeline {
                 }
             }
         }
-        stage ('publish artidfacts to jfrog') {
+      /*  stage ('publish artidfacts to jfrog') {
             steps {
                 script {
                      // 🧰 Use installed JFrog CLI
@@ -76,6 +76,27 @@ pipeline {
                         --min-severity=High \
                         --fail=false
                     """
+                }
+            }
+        }*/
+        stage('Upload to JFrog Artifactory') {
+            steps {
+                script {
+                    def server = Artifactory.server('Jfrog token')
+                    def buildInfo = Artifactory.newBuildInfo()
+
+                    server.upload(
+                        spec: """{
+                            "files": [
+                                {
+                                    "pattern": "target/*.jar",
+                                    "target": "saketh-libs-release/"
+                                }
+                            ]
+                        }""",
+                        buildInfo: buildInfo
+                    )
+                    server.publishBuildInfo(buildInfo)
                 }
             }
         }
