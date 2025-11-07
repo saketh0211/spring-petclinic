@@ -2,10 +2,7 @@ pipeline {
     agent {
         label 'JAVA'
     }
-     environment {
-        SONAR_AUTH_TOKEN   = credentials('SONAR_AUTH_TOKEN')
-        JFROG_ACCESS_TOKEN = credentials('Jfrog token')
-    }
+     
     triggers {
         pollSCM('* * * * *')
     }
@@ -84,7 +81,7 @@ pipeline {
         stage('Upload to JFrog Artifactory') {
             steps {
                 script {
-                    def server = Artifactory.server('$newtokenjfrog')
+                    def server = Artifactory.server('jfrog')
                     def buildInfo = Artifactory.newBuildInfo()
 
                     server.upload(
@@ -92,7 +89,7 @@ pipeline {
                             "files": [
                                 {
                                     "pattern": "target/*.jar",
-                                    "target": "saketh-libs-release/"
+                                    "target": "saketh-libs-release-local"
                                 }
                             ]
                         }""",
