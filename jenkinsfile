@@ -29,67 +29,18 @@ pipeline {
              }
             }
         }
-      /*  stage ('publish artidfacts to jfrog') {
-            steps {
-                script {
-                     // 🧰 Use installed JFrog CLI
-                    def jfrogCli = tool 'jfrog-cli'
-                    
-                    // ✅ Configure JFrog CLI with credentials
-                    sh """
-                        export PATH=$jfrogCli:\$PATH
-                        jf c add JFROG_SPC_JAVA \
-                        --url=https://saketh0211.jfrog.io/artifactory \
-                        --access-token=$JFROG_ACCESS_TOKEN \
-                        --interactive=false
-                    """
-
-                    // ✅ Upload the .jar file to your Artifactory repository
-                    sh """
-                         export PATH=$jfrogCli:\$PATH
-                         jf rt upload "target/*.jar" "javaspc-libs-release-local/" \
-                        --server-id=JFROG_SPC_JAVA \
-                        --build-name=spring-petclinic \
-                        --build-number=$BUILD_NUMBER
-                    """
-
-                    // ✅ Publish build info to Artifactory
-                    sh """
-                        export PATH=$jfrogCli:\$PATH
-                        jf rt build-publish spring-petclinic $BUILD_NUMBER \
-                        --server-id=JFROG_SPC_JAVA
-                    """
-                      
-                }
-            }
-        }
-        stage ('JFrog Xray Vulnerability Scan') {
-            steps {
-                script {
-                    
-                    
-                    // ✅ Scan the uploaded JAR for security issues
-                    sh """
-                        jf xr scan "target/*.jar" \
-                        --server-id=JFROG_SPC_JAVA \
-                        --min-severity=High \
-                        --fail=false
-                    """
-                }
-            }
-        }*/
         stage('Upload to JFrog Artifactory') {
             steps {
                 script {
                     def server = Artifactory.server('jfrog')
-                    def buildInfo = Artifactory.newBuildInfo()
+                     def buildInfo = Artifactory.newBuildInfo()
 
                     server.upload(
                         spec: """{
                             "files": [
                                 {
                                     "pattern": "target/*.jar",
-                                    "target": "saketh-libs-release-local"
+                                    "target": "saketh-libs-release-local/"
                                 }
                             ]
                         }""",
@@ -100,12 +51,12 @@ pipeline {
             }
         }
     }
-  
+
     post {
         always {
             script {
                 node {
-                    archiveArtifacts artifacts: '**/target/*.jar'
+                    
                     junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
                 }
             }
@@ -117,5 +68,4 @@ pipeline {
             echo "not working"
         }
     }
-
 }
