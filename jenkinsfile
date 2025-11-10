@@ -50,28 +50,16 @@ pipeline {
                 }
             }
         }
+        stage ('docker image build') {
+            steps {
+                sh 'docker image build -t saketh-petclinic:1.0 .'
+                sh 'docker image ls'
+            }
+        }
         stage('install trivy and scan image') {
             steps {
-             sh '''
-                # Install Trivy (if not already installed)
-                    echo "Installing Trivy..."
-                   wget -qO trivy.tar.gz https://github.com/aquasecurity/trivy/releases/latest/download/trivy_Linux-64bit.tar.gz
-
-                    tar -zxvf trivy.tar.gz trivy
-                    mv trivy /usr/local/bin/
-
-                    # Verify installation
-                    trivy --version
-
-                    # (Option 1) Scan the JAR file for vulnerabilities
-                    echo "Scanning JAR file..."
-                    trivy fs target/
-
-                    # (Option 2) Scan Docker image if you built one
-                    # echo "Scanning Docker image..."
-                    # trivy image saketh-petclinic:latest
-                '''
-                
+                  sh 'trivy image saketh-petclinic:1.0'
+                 
             }
         }
             
