@@ -16,6 +16,7 @@
 
 FROM openjdk:17
 ADD https://trialk8keoy.jfrog.io/artifactory/saketh-libs-release-local/ 
+WORKDIR /app
 EXPOSE 8080
 CMD ["java","-jar","saketh.jar"]
 
