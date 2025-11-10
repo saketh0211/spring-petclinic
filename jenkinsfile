@@ -55,9 +55,10 @@ pipeline {
              sh '''
                 # Install Trivy (if not already installed)
                     echo "Installing Trivy..."
-                    wget -qO trivy.tar.gz https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.54.1_Linux-64bit.tar.gz
+                   wget -qO trivy.tar.gz https://github.com/aquasecurity/trivy/releases/latest/download/trivy_Linux-64bit.tar.gz
+
                     tar -zxvf trivy.tar.gz trivy
-                    sudo mv trivy /usr/local/bin/
+                    mv trivy /usr/local/bin/
 
                     # Verify installation
                     trivy --version
@@ -70,6 +71,7 @@ pipeline {
                     # echo "Scanning Docker image..."
                     # trivy image saketh-petclinic:latest
                 '''
+                
             }
         }
             
