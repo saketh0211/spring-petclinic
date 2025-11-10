@@ -15,8 +15,8 @@
 
 
 FROM openjdk:17
-ADD https://trialk8keoy.jfrog.io/artifactory/saketh-libs-release-local/spring-petclinic-3.5.0-SNAPSHOT.jar  /app/saketh.jar
 WORKDIR /app
+ADD https://trialk8keoy.jfrog.io/artifactory/saketh-libs-release-local/spring-petclinic-3.5.0-SNAPSHOT.jar  /app/saketh.jar
 EXPOSE 8080
 CMD ["java","-jar","saketh.jar"]
 
