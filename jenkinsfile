@@ -50,7 +50,7 @@ pipeline {
                 }
             }
         }
-        stage(install trivy and scan image) {
+        stage('install trivy and scan image') {
             steps {
              sh '''
                 # Install Trivy (if not already installed)
