@@ -16,8 +16,8 @@
 
 FROM eclipse-temurin:25-jdk-jammy
 WORKDIR /app
-ADD https://trialk8keoy.jfrog.io/artifactory/saketh-libs-release-local/spring-petclinic-3.5.0-SNAPSHOT.jar  /app/saketh.jar
+COPY target/*.jar app.jar
 EXPOSE 8080
-CMD ["java","-jar","saketh.jar"]
+CMD ["java","-jar","app.jar"]
 
 
