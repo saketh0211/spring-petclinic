@@ -56,12 +56,12 @@ pipeline {
                 sh 'docker image ls'
             }
         }
-        stage('install trivy and scan image') {
-            steps {
-                  sh 'trivy image saketh-petclinic:1.0'
+        // stage('install trivy and scan image') {
+        //     steps {
+        //           sh 'trivy image saketh-petclinic:1.0'
                  
-            }
-        }
+        //     }
+        // }
             
     }
 
