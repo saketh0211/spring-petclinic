@@ -100,7 +100,7 @@ pipeline {
 
                             echo "🚀 Running Terraform..."
                             cd terraform/eks
-                            terraform init -input=false
+                            terraform init -reconfigure -input=false
                             terraform apply -auto-approve -input=false
                         '''
                     }
