@@ -28,12 +28,16 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "21.8.0"
 
-  cluster_name    = var.cluster_name
-  cluster_version = "1.29"
-  vpc_id          = module.vpc.vpc_id
-  subnet_ids      = module.vpc.private_subnets
+  cluster = {
+    name    = var.cluster_name
+    version = "1.29"
+  }
 
-  manage_aws_auth_configmap = true
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
+
+  # Control plane and IAM permissions
+  enable_cluster_creator_admin_permissions = true
 
   eks_managed_node_groups = {
     default = {
@@ -41,6 +45,12 @@ module "eks" {
       min_size       = var.min_size
       max_size       = var.max_size
       instance_types = [var.instance_type]
+      capacity_type  = "ON_DEMAND"
     }
+  }
+
+  tags = {
+    Environment = "dev"
+    Project     = "petclinic"
   }
 }
