@@ -1,3 +1,6 @@
+# -----------------------------
+# VPC MODULE
+# -----------------------------
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "6.5.0"
@@ -13,25 +16,31 @@ module "vpc" {
   single_nat_gateway = true
 }
 
+# -----------------------------
+# DATA SOURCE
+# -----------------------------
 data "aws_availability_zones" "available" {}
 
+# -----------------------------
+# EKS MODULE
+# -----------------------------
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "21.8.0"
 
   cluster_name    = var.cluster_name
   cluster_version = "1.29"
-  subnets         = module.vpc.private_subnets
   vpc_id          = module.vpc.vpc_id
+  subnet_ids      = module.vpc.private_subnets
 
-  manage_aws_auth = true
+  manage_aws_auth_configmap = true
 
-  node_groups = {
+  eks_managed_node_groups = {
     default = {
-      desired_capacity = var.desired_capacity
-      min_capacity     = var.min_size
-      max_capacity     = var.max_size
-      instance_types   = [var.instance_type]
+      desired_size   = var.desired_capacity
+      min_size       = var.min_size
+      max_size       = var.max_size
+      instance_types = [var.instance_type]
     }
   }
 }

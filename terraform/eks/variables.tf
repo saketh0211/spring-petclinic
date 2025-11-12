@@ -8,11 +8,6 @@ variable "cluster_name" {
   default = "saketh-eks-cluster"
 }
 
-variable "node_group_name" {
-  type    = string
-  default = "saketh-eks-nodes"
-}
-
 variable "desired_capacity" {
   type    = number
   default = 2
