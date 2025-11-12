@@ -88,7 +88,57 @@ pipeline {
                 }
             }
         }
-            
+        stage('Terraform: Init & Apply (EKS)') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'aws-creds',
+                                                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                                                    passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        sh '''
+                            export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                            export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+                            export AWS_DEFAULT_REGION=${AWS_REGION}
+
+                            echo "🚀 Running Terraform..."
+                            cd terraform/eks
+                            terraform init -input=false
+                            terraform apply -auto-approve -input=false
+                        '''
+                    }
+                }
+            }
+        stage('Configure kubectl') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'aws-creds',
+                                                 usernameVariable: 'AWS_ACCESS_KEY_ID',
+                                                 passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh '''
+                        export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                        export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+                        export AWS_DEFAULT_REGION=${AWS_REGION}
+
+                        echo "Configuring kubeconfig for EKS..."
+                        aws eks update-kubeconfig --region ${AWS_REGION} --name ${CLUSTER_NAME}
+
+                        echo "✅ Connected to cluster:"
+                        kubectl get nodes
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                    echo "Deploying latest image to EKS..."
+                    sed -i "s|image: .*|image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:latest|" k8s/deployment.yaml
+                    
+                    kubectl apply -f k8s/deployment.yaml
+                    kubectl rollout status deployment/saketh-petclinic --timeout=120s
+                    kubectl get svc saketh-petclinic-svc
+                    echo "✅ Deployment successful!"
+                '''
+            }
+        }
     }
 
     post {

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saketh-petclinic
+  labels:
+    app: saketh-petclinic
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: saketh-petclinic
+  template:
+    metadata:
+      labels:
+        app: saketh-petclinic
+    spec:
+      containers:
+        - name: petclinic
+          image: 700538667767.dkr.ecr.ap-south-1.amazonaws.com/saketh-petclinic:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: saketh-petclinic-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: saketh-petclinic
+  ports:
+    - port: 80
+      targetPort: 8080
