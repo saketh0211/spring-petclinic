@@ -81,7 +81,7 @@ pipeline {
                         aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                         
                         echo "Pushing image to ECR..."
-                        docker tag saketh-petclinic:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/saketh-petclinic:latest
+                        docker tag saketh-petclinic:1.0 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/saketh-petclinic:latest
                         docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:latest
                         echo "✅ Image successfully pushed to ECR!"
                     '''
