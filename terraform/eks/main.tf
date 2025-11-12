@@ -32,7 +32,7 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
   eks_managed_node_groups = {
     default = {
-      name           = "${var.cluster_name}-nodes"
+      name           = "saketh-nodes"
       desired_size   = var.desired_capacity
       min_size       = var.min_size
       max_size       = var.max_size
